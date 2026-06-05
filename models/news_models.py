@@ -16,10 +16,10 @@ class Base(DeclarativeBase):
         comment="更新时间"
     )
 
-class Categroy(Base):
-    __tablename__ = 'news_categroy'
-    id:Mapped[int]=mapped_column(Integer,primary_key=True,autoincrement=True,commit="分类id")
-    name:Mapped[str]=mapped_column(String(50),unique=True,nullable=False,commit="分类名称")
+class Category(Base):
+    __tablename__ = 'news_category'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True,autoincrement=True,comment="分类id")
+    name:Mapped[str]=mapped_column(String(50),unique=True,nullable=False,comment="分类名称")
     sort_order:Mapped[int]=mapped_column(Integer,default=0,comment="排序")
     def __repr__(self):
-        return f"<Categroy {self.id},name={self.name},sort_order={self.sort_order}>"
+        return f"<Category {self.id},name={self.name},sort_order={self.sort_order}>"
