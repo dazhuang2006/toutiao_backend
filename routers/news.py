@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+
 from fastapi import Query
 
 from fastapi import APIRouter,Depends
@@ -41,5 +43,33 @@ async def get_news(
             "list":new_list,
             "total":total,
             "hasMore":has_more
+        }
+    }
+#获取新闻详情
+@router.get("/detail")
+async def get_news_detail(news_id:int=Query(...,alias="id"),db:AsyncSession=Depends(get_db)):
+    news_detail=await news_crud.get_news_detail(db,news_id)
+    if not news_detail:
+       raise HTTPException(status_code=404,detail="新闻不存在")
+    views_res=await news_crud.update_news_views(db,news_detail.id)
+
+    if not views_res:
+        raise HTTPException(status_code=404,detail="新闻不存在")
+    related_news=await news_crud.get_related_news(db,news_detail.id,news_detail.category_id)
+
+    return {
+        "code":200,
+        "message":"success",
+        "data":{
+            "id":news_detail.id,
+            "title":news_detail.title,
+            "description":news_detail.description,
+            "content":news_detail.content,
+            "image":news_detail.image,
+            "author":news_detail.author,
+            "categoryId":news_detail.category_id,
+            "views":news_detail.views,
+            "publishTime":news_detail.publish_time,
+            "relatedNews":related_news
         }
     }
