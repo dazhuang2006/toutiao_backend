@@ -8,7 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from config.db_conf import get_db
 from crud.user_crud import get_user_by_username
 from models.user_models import User
-from schemas.news_sch import UserRequest, UserAuthResponse, UserInfoResponse
+from schemas.news_sch import UserRequest, UserAuthResponse, UserInfoResponse, UserUpdateRequest, \
+    UserUpdatePasswordRequest
 from crud import user_crud
 from utils.auth import get_current_user
 from utils.response import success_response
@@ -52,6 +53,22 @@ async def login(user_data:UserRequest,db:AsyncSession=Depends(get_db)):
 @router.get("/info")
 async def get_user_info(user:User=Depends(get_current_user)):
     return success_response(message="获取用户信息成功",data=UserInfoResponse.model_validate( user))
+#修改用户信息
+@router.put("/update")
+async def update_user_info(user_data:UserUpdateRequest,user:User=Depends(get_current_user),
+                           db:AsyncSession=Depends(get_db)):
+    user=await user_crud.update_user(user_data,user.username,db)
+
+    return success_response(message="修改用户信息成功",data=UserInfoResponse.model_validate( user))
+#修改用户密码
+@router.put("/update_password")
+async def update_password(password_data:UserUpdatePasswordRequest,user:User=Depends(get_current_user),
+                           db:AsyncSession=Depends(get_db)):
+    res_change_pwd=await user_crud.change_password(password_data.old_password,user.username,user,db)
+    if not res_change_pwd:
+        raise HTTPException(status_code=status.HTTP_500_UNAUTHORIZED,detail="修改密码失败")
+    return success_response(message="修改用户密码成功")
+
 
 
 

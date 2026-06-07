@@ -1,12 +1,17 @@
 import uuid
 from datetime import datetime, timedelta
+from email import utils
 
+from fastapi import HTTPException
+from starlette import status
+
+from utils import secrity
 from utils.secrity import verify_password
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.user_models import User, UserToken
-from schemas.news_sch import UserRequest
+from schemas.news_sch import UserRequest, UserUpdateRequest
 from utils.secrity import get_password_hash
 
 
@@ -57,3 +62,29 @@ async def get_user_by_token(token:str,db:AsyncSession):
     query=select(User).where(User.id==db_token.user_id)
     result=await db.execute(query)
     return result.scalar_one_or_none()
+#更新用户信息
+async def update_user(user_data:UserUpdateRequest,username:str,db:AsyncSession):
+    query=update(User).where(User.name==username).values(**user_data.model_dump(
+        exclude_unset=True,
+        exclude_none=True
+    ))
+    result=await db.execute(query)
+    await db.commit()
+    #检查更新,是否命中
+    if result.rowcout ==0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="用户不存在")
+    #获取用户更新结果
+    update_user=await get_user_by_username(username,db)
+    return update_user
+#更新用户密码,验证旧密码,弄新密码加密，提交
+async def change_password(old_password:str,new_password:str,user: User,db:AsyncSession):
+    if not verify_password(old_password,user.password):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="旧密码错误")
+    hashed_new_password=secrity.get_password_hash(new_password)
+    user.password=hashed_new_password
+    #由SQLAlchemy接管User对象，确保可以commit
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return True
+

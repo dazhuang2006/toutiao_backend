@@ -1,6 +1,7 @@
 from typing import Optional
 
 from pydantic import BaseModel, Field, ConfigDict
+#from typing_inspection.typing_objects import alias
 
 
 class UserRequest(BaseModel):
@@ -39,3 +40,14 @@ class UserAuthResponse(BaseModel):
         populate_by_name=True,
         from_attributes= True
     )
+#更新用户信息的模型类
+class UserUpdateRequest(BaseModel):
+    nickname:str=None
+    avatar:str=None
+    gender:str=None
+    bio:str=None
+    phone:str=None
+#修改密码模型类
+class UserUpdatePasswordRequest(BaseModel):
+    old_password:str=Field(...,alias="oldPassword",description="旧密码")
+    new_password:str=Field(...,min_length=6,max_length=20,alias="newPassword",description="新密码")
