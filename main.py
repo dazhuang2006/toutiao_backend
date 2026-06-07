@@ -1,12 +1,9 @@
 from fastapi import FastAPI
-from routers import news
+from routers import news, users
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-origins = [
-    "",
-    "",
-]
+
 #跨域中间件
 app.add_middleware(
     CORSMiddleware,
@@ -21,4 +18,5 @@ async def root():
     return {"message": "Hello World"}
 #注册router路由
 app.include_router(news.router)
+app.include_router(users.router)
 
