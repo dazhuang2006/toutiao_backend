@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from config.db_conf import get_db
 from crud import news_crud
+from schemas.news_sch import UserInfoResponse, UserAuthResponse
 
 #模块化路由
 router = APIRouter(prefix="/api/news",tags=["news"])
@@ -57,6 +58,7 @@ async def get_news_detail(news_id:int=Query(...,alias="id"),db:AsyncSession=Depe
         raise HTTPException(status_code=404,detail="新闻不存在")
     related_news=await news_crud.get_related_news(db,news_detail.id,news_detail.category_id)
 
+
     return {
         "code":200,
         "message":"success",
@@ -73,3 +75,5 @@ async def get_news_detail(news_id:int=Query(...,alias="id"),db:AsyncSession=Depe
             "relatedNews":related_news
         }
     }
+
+
