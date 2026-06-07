@@ -7,8 +7,10 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from config.db_conf import get_db
 from crud.user_crud import get_user_by_username
+from models.user_models import User
 from schemas.news_sch import UserRequest, UserAuthResponse, UserInfoResponse
 from crud import user_crud
+from utils.auth import get_current_user
 from utils.response import success_response
 
 router = APIRouter(prefix="/api/user",tags=["users"])
@@ -37,5 +39,21 @@ async def register(user_data:UserRequest,db:AsyncSession=Depends(get_db)):
         }
     }
 '''
+#用户登录
+@router.post("/login")
+async def login(user_data:UserRequest,db:AsyncSession=Depends(get_db)):
+    user=await user_crud.authenticate_user(user_data.username,user_data.password,db)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="用户名或密码错误")
+    token=await user_crud.create_token(user.id,db)
+    responses_data=UserAuthResponse(token=token,user_info=UserInfoResponse.model_validate( user))
+    return success_response(message="登录成功",data=responses_data)
+#获取用户信息
+@router.get("/info")
+async def get_user_info(user:User=Depends(get_current_user)):
+    return success_response(message="获取用户信息成功",data=UserInfoResponse.model_validate( user))
+
+
+
 
 

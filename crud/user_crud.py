@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime, timedelta
 
+from utils.secrity import verify_password
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -38,3 +39,21 @@ async def create_token(user_id:int,db:AsyncSession):
         db.add(user_token)
         await db.commit()
     return token
+#验证用户
+async def authenticate_user(username:str,password:str,db:AsyncSession):
+    user=await get_user_by_username(username,db)
+    if not user:
+        return None
+    if not verify_password(password,user.password):
+        return None
+    return user
+#根据token查用户
+async def get_user_by_token(token:str,db:AsyncSession):
+    query=select(UserToken).where(UserToken.token==token)
+    result=await db.execute(query)
+    db_token=result.scalar_one_or_none()
+    if not db_token or db_token.expires_at<datetime.now():
+        return None
+    query=select(User).where(User.id==db_token.user_id)
+    result=await db.execute(query)
+    return result.scalar_one_or_none()
