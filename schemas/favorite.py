@@ -16,7 +16,7 @@ class FavoriteAddRequest(BaseModel):
 
 #收藏列表模型类
 class FavoriteNewsItemResponse(NewsItemBase):
-    favorite_id:Field(...,alias="favoriteId",description="收藏id")
+    favorite_id:int=Field(...,alias="favoriteId",description="收藏id")
     favorite_time:datetime = Field(...,alias="favoriteTime",description="收藏时间")
     model_config = ConfigDict(
         from_attributes=True,  # 允许从 ORM 模型对象属性中取值

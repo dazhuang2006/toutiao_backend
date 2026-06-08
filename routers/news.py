@@ -6,7 +6,7 @@ from fastapi import APIRouter,Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config.db_conf import get_db
-from crud import news_crud
+from crud import news_crud, news_crud_cache
 from schemas.news_sch import UserInfoResponse, UserAuthResponse
 
 #模块化路由
@@ -14,7 +14,9 @@ router = APIRouter(prefix="/api/news",tags=["news"])
 # 获取新闻分类列表
 @router.get("/categorise")
 async def categorise(skip:int=0, limit:int=100,db:AsyncSession=Depends(get_db)):
-    categories = await news_crud.get_categorise(db,skip,limit)
+    #categories = await news_crud.get_categorise(db,skip,limit)
+    #换了个新的有缓存的
+    categories = await news_crud_cache.get_categorise(db, skip, limit)
     return {
         "code":200,
         "message":"获取新闻分类列表",
@@ -31,7 +33,9 @@ async def get_news(
 ):
     #指定id查询并且分页处理
     offset=(page-1)*page_size
-    new_list=await news_crud.get_news_list(db,category_id,offset,page_size)
+    #new_list=await news_crud.get_news_list(db,category_id,offset,page_size)
+    #换个缓存的
+    new_list = await news_crud_cache.get_news_list(db, category_id, offset, page_size)
     #获取新闻总数
     total=await news_crud.get_news_count(db,category_id)
     #是否还有更多新闻
