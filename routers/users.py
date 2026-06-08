@@ -1,7 +1,7 @@
-from http.client import responses
+#from http.client import responses
 
 from fastapi import HTTPException
-from pyexpat.errors import messages
+#from pyexpat.errors import messages
 from starlette import status
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -64,7 +64,7 @@ async def update_user_info(user_data:UserUpdateRequest,user:User=Depends(get_cur
 @router.put("/update_password")
 async def update_password(password_data:UserUpdatePasswordRequest,user:User=Depends(get_current_user),
                            db:AsyncSession=Depends(get_db)):
-    res_change_pwd=await user_crud.change_password(password_data.old_password,user.username,user,db)
+    res_change_pwd=await user_crud.change_password(password_data.old_password,password_data.new_password,user,db)
     if not res_change_pwd:
         raise HTTPException(status_code=status.HTTP_500_UNAUTHORIZED,detail="修改密码失败")
     return success_response(message="修改用户密码成功")

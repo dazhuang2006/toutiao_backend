@@ -64,14 +64,14 @@ async def get_user_by_token(token:str,db:AsyncSession):
     return result.scalar_one_or_none()
 #更新用户信息
 async def update_user(user_data:UserUpdateRequest,username:str,db:AsyncSession):
-    query=update(User).where(User.name==username).values(**user_data.model_dump(
+    query=update(User).where(User.username==username).values(**user_data.model_dump(
         exclude_unset=True,
         exclude_none=True
     ))
     result=await db.execute(query)
     await db.commit()
     #检查更新,是否命中
-    if result.rowcout ==0:
+    if result.rowcount ==0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="用户不存在")
     #获取用户更新结果
     update_user=await get_user_by_username(username,db)

@@ -28,7 +28,7 @@ class FavoriteNewsItemResponse(NewsItemBase):
 class FavoriteListResponse(BaseModel):
     list:list[FavoriteNewsItemResponse]
     total:int
-    hasmore:bool=Field(...,alias="hasMore",description="是否有更多")
+    has_more:bool=Field(...,alias="hasMore",description="是否有更多")
 
     model_config = ConfigDict(
         from_attributes=True,  # 允许从 ORM 模型对象属性中取值

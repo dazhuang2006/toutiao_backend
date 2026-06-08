@@ -1,5 +1,3 @@
-
-
 from fastapi import APIRouter, Query, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -7,7 +5,7 @@ from starlette import status
 from config.db_conf import get_db
 from crud import user_crud, favorite_crud
 from models.user_models import User
-from schemas.favorite import FavoriteCheckRequest, FavoriteListResponse
+from schemas.favorite import FavoriteCheckRequest, FavoriteListResponse, FavoriteAddRequest
 from utils.auth import get_current_user
 from utils.response import success_response
 
@@ -22,7 +20,7 @@ async def check_favorite(news_id:int=Query( ...,alias="news_Id"),user:User=Depen
     return success_response(message="检查收藏成功",data=FavoriteCheckRequest(isFavorite=is_favorite))
 #添加收藏
 @router.post("/add")
-async def add_favorite(data:FavoriteCheckRequest,
+async def add_favorite(data:FavoriteAddRequest,
                        user:User=Depends(get_current_user),
                        db:AsyncSession=Depends(get_db)):
     result=await favorite_crud.add_favorite(data.news_id,user.id,db)
@@ -34,7 +32,7 @@ async def remove_favorite(news_id:int=Query( ...,alias="news_Id"),
                           db:AsyncSession=Depends(get_db)):
     result=await favorite_crud.remove_news_favorite(news_id,user.id,db)
     if not result:
-        raise HTTPException(status_code=status.HTTP_404_INTERNAL_SERVER_ERROR,detail="取消收藏失败")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="取消收藏失败")
     return success_response(message="取消收藏成功")
 #获取收藏列表
 @router.get("/list")
@@ -50,7 +48,7 @@ async def get_favorite_list(user:User=Depends(get_current_user),
         "favorite_id":favorite_id
     } for news,favorite_time,favorite_id in rows]
     has_more=total>page_size* page
-    data=FavoriteListResponse(list=favorite_list,total=total,hasmore=has_more)
+    data=FavoriteListResponse(list=favorite_list,total=total,has_more=has_more)
     return success_response(message="获取收藏列表成功",data=data)
 
 #清空收藏

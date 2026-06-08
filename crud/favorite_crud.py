@@ -1,5 +1,5 @@
 from fastapi import Depends
-from select import select
+from sqlalchemy import select
 from sqlalchemy import delete, func, join
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -41,16 +41,17 @@ async def get_favorite_list(
         db:AsyncSession=Depends(get_db)
 ):
     #总量+收藏新闻列表
-    count_query=select(func.cout()).where(Favorite.user_id==user_id)
+    count_query=select(func.count()).where(Favorite.user_id==user_id)
     count_result=await db.execute(count_query)
     total=count_result.scalar_one()
-    offer=page-1*page_size
-    #起别名方便辨识
-    query=(select(News,Favorite.created_at.label("favorite_time")),
-     join(Favorite,Favorite.news_id==News.id)
-     .where(Favorite.user_id==user_id)
-     .order_by(Favorite.created_at.desc())
-     .offset(offer).limit(page_size))
+    offset=(page-1)*page_size
+    query=(select(News, 
+                  Favorite.created_at.label("favorite_time"),
+                  Favorite.id.label("favorite_id"))
+           .join(Favorite, Favorite.news_id==News.id)
+           .where(Favorite.user_id==user_id)
+           .order_by(Favorite.created_at.desc())
+           .offset(offset).limit(page_size))
     result=await db.execute(query)
     rows=result.all()
     return rows,total
