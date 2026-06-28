@@ -1,0 +1,38 @@
+# created by virtualenv automatically
+*
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+
+# Claude
+.claude/
+
+# Environment
+.env
+
+# Logs
+logs/
+*.log
+
+# Database
+*.db
+
+# OS
+.DS_Store
+Thumbs.db
+# Frontend
+!frontend/
+!frontend/**
+frontend/node_modules/
+frontend/dist/
+frontend/tmp_cache_dir/
+!.gitignore

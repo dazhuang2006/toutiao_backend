@@ -12,6 +12,7 @@ redis_client=redis.Redis(
     host=REDIS_HOST,#redis服务主机地址
     port=REDIS_PORT,#redis服务端口号
     db=REDIS_DB,#redis数据库编号 0-15
+    protocol=2,
     decode_responses=True #设置返回结果为字符串类型
 
 )
@@ -37,8 +38,8 @@ async def get_json_cache(key:str):
 async def set_cache(key:str,value:Any,expire:int=3600):
     try:
         if isinstance(value,(dict,list)):
-            value=json.dumps(value,ensure_ascii=False)#保留中文
-        await redis_client.set(key,expire,value)
+            value=json.dumps(value,ensure_ascii=False)
+        await redis_client.set(key, value, ex=expire)
         return True
     except Exception as e:
         print(f"设置缓存失败：{e}")
