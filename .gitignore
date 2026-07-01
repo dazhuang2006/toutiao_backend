@@ -36,3 +36,5 @@ frontend/node_modules/
 frontend/dist/
 frontend/tmp_cache_dir/
 !.gitignore
+!Dockerfile
+!docker-compose.yml
