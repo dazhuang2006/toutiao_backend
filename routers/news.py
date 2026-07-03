@@ -9,6 +9,8 @@ from config.db_conf import get_db
 from crud import news_crud, news_crud_cache
 from schemas.news_sch import UserInfoResponse, UserAuthResponse
 
+from services.ai_summary_service import ai_summary_service
+
 #模块化路由
 router = APIRouter(prefix="/api/news",tags=["news"])
 # 获取新闻分类列表
@@ -61,22 +63,26 @@ async def get_news_detail(news_id:int=Query(...,alias="id"),db:AsyncSession=Depe
     if not views_res:
         raise HTTPException(status_code=404,detail="新闻不存在")
     related_news=await news_crud.get_related_news(db,news_detail.id,news_detail.category_id)
-
+    summary = await ai_summary_service.get_summary(
+        db=db,
+        news_id=news_detail.id,
+    )
 
     return {
-        "code":200,
-        "message":"success",
-        "data":{
-            "id":news_detail.id,
-            "title":news_detail.title,
-            "description":news_detail.description,
-            "content":news_detail.content,
-            "image":news_detail.image,
-            "author":news_detail.author,
-            "categoryId":news_detail.category_id,
-            "views":news_detail.views,
-            "publishTime":news_detail.publish_time,
-            "relatedNews":related_news
+        "code": 200,
+        "message": "success",
+        "data": {
+            "id": news_detail.id,
+            "title": news_detail.title,
+            "description": news_detail.description,
+            "content": news_detail.content,
+            "summary": summary,  # 新增
+            "image": news_detail.image,
+            "author": news_detail.author,
+            "categoryId": news_detail.category_id,
+            "views": news_detail.views,
+            "publishTime": news_detail.publish_time,
+            "relatedNews": related_news
         }
     }
 

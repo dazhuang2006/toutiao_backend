@@ -1,20 +1,17 @@
-# created by virtualenv automatically
-*
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
+*.pyo
 
 # Virtual Environment
-.venv/
 venv/
+.venv/
+env/
 
 # IDE
 .idea/
 .vscode/
-
-# Claude
-.claude/
+*.iml
 
 # Environment
 .env
@@ -25,16 +22,14 @@ logs/
 
 # Database
 *.db
+*.sqlite3
 
-# OS
+# Redis
+dump.rdb
+appendonly.aof
+
+# macOS
 .DS_Store
+
+# Windows
 Thumbs.db
-# Frontend
-!frontend/
-!frontend/**
-frontend/node_modules/
-frontend/dist/
-frontend/tmp_cache_dir/
-!.gitignore
-!Dockerfile
-!docker-compose.yml

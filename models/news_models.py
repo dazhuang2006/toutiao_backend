@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy.orm import DeclarativeBase,Mapped,mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import DateTime, Integer, String, Index, Text, ForeignKey
 from datetime import datetime
 
@@ -47,6 +47,7 @@ class News(Base):
                                                  comment="分类ID")
         views: Mapped[int] = mapped_column(Integer, default=0, nullable=False, comment="浏览量")
         publish_time: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, comment="发布时间")
+        summary = relationship("NewsAISummary", back_populates="news", uselist=False)
 
         def __repr__(self):
             return f"<News(id={self.id}, title='{self.title}', views={self.views})>"
