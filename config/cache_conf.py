@@ -3,9 +3,12 @@ from email.policy import default
 from typing import Any
 
 import redis.asyncio as redis
-REDIS_HOST="localhost"
-REDIS_PORT=6379
-REDIS_DB=0
+import os
+from dotenv import load_dotenv
+load_dotenv()
+REDIS_HOST=os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT=int(os.getenv("REDIS_PORT", 6379))
+REDIS_DB=int(os.getenv("REDIS_DB", 0))
 
 #创建redis的连接对象
 redis_client=redis.Redis(

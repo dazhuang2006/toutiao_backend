@@ -46,3 +46,17 @@ tash
 
 # Design references (外部素材)
 design-md/
+
+# Node.js
+node_modules/
+frontend/node_modules/
+
+# Build output
+frontend/dist/
+
+# Temp
+frontend/tmp_cache_dir/
+tash
+
+# Design references
+design-md/
