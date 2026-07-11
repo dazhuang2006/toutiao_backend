@@ -1,211 +1,107 @@
 <template>
   <div class="page profile-page">
-    <div class="profile-card">
-      <div class="profile-header">
-        <div class="avatar-large">{{ userInfo.username.charAt(0).toUpperCase() }}</div>
-        <div>
-          <h2>{{ userInfo.username }}</h2>
-          <p class="profile-bio" v-if="userInfo.bio">{{ userInfo.bio }}</p>
-        </div>
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <img v-if="userInfo?.avatar" :src="userInfo.avatar" />
+        <span v-else class="avatar-letter">{{ userInfo?.username?.[0] || "U" }}</span>
       </div>
+      <h2 class="profile-name">{{ userInfo?.username || "用户" }}</h2>
+      <p v-if="userInfo?.bio" class="profile-bio">{{ userInfo.bio }}</p>
+    </div>
 
-      <div class="tabs">
-        <button :class="['tab', { active: activeTab === 'info' }]" @click="activeTab = 'info'">个人信息</button>
-        <button :class="['tab', { active: activeTab === 'pwd' }]" @click="activeTab = 'pwd'">修改密码</button>
+    <div class="profile-section">
+      <h3 class="section-label">个人信息</h3>
+      <div class="form-group">
+        <label class="form-label">昵称</label>
+        <input v-model="form.nickname" class="input" placeholder="设置昵称" />
       </div>
-
-      <form v-if="activeTab === 'info'" @submit.prevent="updateProfile" class="profile-form">
-        <div class="form-group">
-          <label>昵称</label>
-          <input v-model="form.nickname" class="input" placeholder="设置昵称" />
-        </div>
-        <div class="form-group">
-          <label>个人简介</label>
-          <textarea v-model="form.bio" class="input" rows="3" placeholder="写点个人介绍"></textarea>
-        </div>
-        <div class="form-group">
-          <label>性别</label>
-          <select v-model="form.gender" class="input">
-            <option value="">保密</option>
-            <option value="男">男</option>
-            <option value="女">女</option>
-          </select>
-        </div>
-        <p class="error-text" v-if="infoError">{{ infoError }}</p>
-        <button type="submit" class="btn btn-primary" :disabled="infoSubmitting">
-          {{ infoSubmitting ? '保存中...' : '保存修改' }}
-        </button>
-      </form>
-
-      <form v-else @submit.prevent="changePwd" class="profile-form">
-        <div class="form-group">
-          <label>原密码</label>
-          <input v-model="pwdForm.oldPassword" class="input" type="password" placeholder="输入原密码" required />
-        </div>
-        <div class="form-group">
-          <label>新密码</label>
-          <input v-model="pwdForm.newPassword" class="input" type="password" placeholder="输入新密码（至少6位）" required minlength="6" />
-        </div>
-        <p class="error-text" v-if="pwdError">{{ pwdError }}</p>
-        <button type="submit" class="btn btn-primary" :disabled="pwdSubmitting">
-          {{ pwdSubmitting ? '修改中...' : '修改密码' }}
-        </button>
-      </form>
-
-      <div class="logout-area">
-        <button class="btn btn-danger" @click="handleLogout">退出登录</button>
+      <div class="form-group">
+        <label class="form-label">个人简介</label>
+        <input v-model="form.bio" class="input" placeholder="介绍一下自己" />
       </div>
+      <button class="btn btn-primary" @click="handleUpdate" :disabled="updating">
+        {{ updating ? "保存中..." : "保存修改" }}
+      </button>
+    </div>
+
+    <div class="profile-section">
+      <h3 class="section-label">修改密码</h3>
+      <div class="form-group">
+        <label class="form-label">旧密码</label>
+        <input v-model="pwdForm.oldPassword" type="password" class="input" placeholder="输入旧密码" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">新密码</label>
+        <input v-model="pwdForm.newPassword" type="password" class="input" placeholder="输入新密码（至少6位）" minlength="6" />
+      </div>
+      <button class="btn btn-outline" @click="handleChangePwd" :disabled="changingPwd">
+        {{ changingPwd ? "修改中..." : "修改密码" }}
+      </button>
+    </div>
+
+    <div class="profile-section logout-section">
+      <button class="btn btn-danger logout-btn" @click="handleLogout">退出登录</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { getUserInfo, updateUserInfo, updatePassword } from '@/api/user'
-import { useUserStore } from '@/stores/user'
+import { ref, reactive, onMounted } from "vue"
+import { useRouter } from "vue-router"
+import { getUserInfo, updateUserInfo, updatePassword } from "@/api/user"
+import { useUserStore } from "@/stores/user"
 
 const router = useRouter()
-const { userInfo, updateUserInfo: updateStore, logout } = useUserStore()
+const { userInfo, updateUserInfo: storeUpdate, logout } = useUserStore()
 
-const activeTab = ref('info')
-
-const form = ref({ nickname: '', bio: '', gender: '' })
-const infoError = ref('')
-const infoSubmitting = ref(false)
-
-const pwdForm = ref({ oldPassword: '', newPassword: '' })
-const pwdError = ref('')
-const pwdSubmitting = ref(false)
-
-function handleLogout() {
-  logout()
-  router.push('/')
-}
-
-async function updateProfile() {
-  infoError.value = ''
-  infoSubmitting.value = true
-  try {
-    const data = {}
-    if (form.value.nickname) data.nickname = form.value.nickname
-    if (form.value.bio) data.bio = form.value.bio
-    if (form.value.gender) data.gender = form.value.gender
-    const res = await updateUserInfo(data)
-    updateStore(res.data)
-  } catch (e) {
-    infoError.value = e.response?.data?.detail || '保存失败'
-  } finally {
-    infoSubmitting.value = false
-  }
-}
-
-async function changePwd() {
-  pwdError.value = ''
-  if (pwdForm.value.newPassword.length < 6) {
-    pwdError.value = '新密码长度至少6位'
-    return
-  }
-  pwdSubmitting.value = true
-  try {
-    await updatePassword(pwdForm.value.oldPassword, pwdForm.value.newPassword)
-    pwdForm.value = { oldPassword: '', newPassword: '' }
-  } catch (e) {
-    pwdError.value = e.response?.data?.detail || '修改密码失败'
-  } finally {
-    pwdSubmitting.value = false
-  }
-}
+const form = reactive({ nickname: "", bio: "" })
+const pwdForm = reactive({ oldPassword: "", newPassword: "" })
+const updating = ref(false)
+const changingPwd = ref(false)
 
 onMounted(() => {
   if (userInfo.value) {
-    form.value = {
-      nickname: userInfo.value.nickname || '',
-      bio: userInfo.value.bio || '',
-      gender: userInfo.value.gender || ''
-    }
+    form.nickname = userInfo.value.nickname || ""
+    form.bio = userInfo.value.bio || ""
   }
 })
+
+async function handleUpdate() {
+  updating.value = true
+  try {
+    const res = await updateUserInfo({ nickname: form.nickname, bio: form.bio })
+    storeUpdate(res.data)
+  } catch (e) { console.error(e) }
+  finally { updating.value = false }
+}
+
+async function handleChangePwd() {
+  changingPwd.value = true
+  try {
+    await updatePassword(pwdForm.oldPassword, pwdForm.newPassword)
+    pwdForm.oldPassword = ""
+    pwdForm.newPassword = ""
+  } catch (e) { console.error(e) }
+  finally { changingPwd.value = false }
+}
+
+function handleLogout() {
+  logout()
+  router.push("/")
+}
 </script>
 
 <style scoped>
-.profile-page {
-  padding-top: calc(var(--header-height) + 16px);
-}
-
-.profile-card {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: 28px 24px;
-}
-
-.profile-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.avatar-large {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-.profile-bio {
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  margin-top: 4px;
-}
-
-.tabs {
-  display: flex;
-  gap: 0;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.tab {
-  padding: 10px 20px;
-  font-size: 15px;
-  color: var(--color-text-secondary);
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
-}
-.tab.active {
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
-}
-
-.profile-form {
-  max-width: 400px;
-}
-
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  margin-bottom: 6px;
-  font-weight: 500;
-}
-
-.logout-area {
-  margin-top: 32px;
-  padding-top: 20px;
-  border-top: 1px solid var(--color-border);
-}
+.profile-header { text-align: center; padding: 24px 0 20px; }
+.profile-avatar { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 12px; overflow: hidden; background: var(--primary-soft); display: flex; align-items: center; justify-content: center; }
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-letter { font-size: 28px; font-weight: 700; color: var(--primary); }
+.profile-name { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.profile-bio { font-size: 14px; color: var(--text-muted); }
+.profile-section { background: var(--surface); border-radius: var(--radius-md); padding: 20px; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
+.section-label { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.form-group { margin-bottom: 14px; }
+.form-label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
+.logout-section { margin-top: 24px; }
+.logout-btn { width: 100%; padding: 10px; font-size: 15px; }
 </style>

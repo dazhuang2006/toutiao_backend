@@ -1,42 +1,35 @@
 <template>
-  <header class="header">
+  <header class="app-header">
     <div class="header-inner">
-      <router-link to="/" class="logo">今日头条</router-link>
-      <nav class="nav">
-        <template v-if="isLoggedIn">
-          <router-link to="/favorites" class="nav-link">收藏</router-link>
-          <router-link to="/history" class="nav-link">历史</router-link>
-          <router-link to="/profile" class="nav-link user-link">
-            <span class="avatar-mini">{{ userInfo.username.charAt(0).toUpperCase() }}</span>
-            <span>{{ userInfo.username }}</span>
-          </router-link>
-        </template>
-        <template v-else>
-          <router-link to="/login" class="nav-link">登录</router-link>
-          <router-link to="/register" class="btn btn-primary btn-sm">注册</router-link>
-        </template>
-      </nav>
+      <router-link to="/" class="logo">
+        <span class="logo-icon">&#9670;</span>
+        <span class="logo-text">AI 头条</span>
+      </router-link>
+      <div class="header-right">
+        <router-link v-if="!isLoggedIn" to="/login" class="login-btn">登录</router-link>
+        <router-link v-else to="/profile" class="avatar-link">
+          <img v-if="userInfo?.avatar" :src="userInfo.avatar" class="avatar" />
+          <span v-else class="avatar-placeholder">{{ userInfo?.username?.[0] || "U" }}</span>
+        </router-link>
+      </div>
     </div>
   </header>
 </template>
 
 <script setup>
-import { useUserStore } from '@/stores/user'
+import { useUserStore } from "@/stores/user"
 const { isLoggedIn, userInfo } = useUserStore()
 </script>
 
 <style scoped>
-.header {
+.app-header {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   height: var(--header-height);
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
   z-index: 100;
 }
-
 .header-inner {
   max-width: var(--max-width);
   margin: 0 auto;
@@ -46,47 +39,21 @@ const { isLoggedIn, userInfo } = useUserStore()
   justify-content: space-between;
   padding: 0 16px;
 }
-
-.logo {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--color-primary);
-  letter-spacing: 1px;
+.logo { display: flex; align-items: center; gap: 8px; }
+.logo-icon { font-size: 22px; color: var(--primary); line-height: 1; }
+.logo-text { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+.login-btn {
+  font-size: 14px; font-weight: 500; color: var(--accent);
+  padding: 6px 14px; border: 1px solid var(--accent); border-radius: var(--radius-pill);
+  transition: all 0.15s;
 }
-
-.nav {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.nav-link {
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  padding: 6px 10px;
-  border-radius: var(--radius-sm);
-  transition: color 0.2s;
-}
-.nav-link:hover {
-  color: var(--color-primary);
-}
-
-.user-link {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.avatar-mini {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 600;
+.login-btn:hover { background: var(--accent); color: #fff; }
+.avatar-link { display: flex; align-items: center; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+.avatar-placeholder {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--primary); color: #fff; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 600;
 }
 </style>

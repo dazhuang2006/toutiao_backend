@@ -1,14 +1,13 @@
 from datetime import datetime
 
 from sqlalchemy import UniqueConstraint, Index, Integer, ForeignKey, DateTime
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 
 from models.news_models import News
 from models.user_models import User
 
 
-class Base(DeclarativeBase):
-    pass
+from models.base import Base
 
 
 class Favorite(Base):

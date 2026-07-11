@@ -22,7 +22,7 @@ request.interceptors.response.use(
     const res = response.data
     if (res.code !== 200) {
       console.error('API Error:', res.message)
-      return Promise.reject(new Error(res.message || '请求失败'))
+      return Promise.reject(new Error(res.message || 'Request failed'))
     }
     return res
   },
