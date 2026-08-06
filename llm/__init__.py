@@ -1,6 +1,5 @@
-from .deepseek_client import deepseek_client, DeepSeekClient
+from .model import model
 
 __all__ = [
-    "deepseek_client",
-    "DeepSeekClient",
+    "model",
 ]

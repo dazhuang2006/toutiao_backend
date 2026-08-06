@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from routers import news, users, favorite, history
+
+from routers import news, users, favorite, history, ai_summary_router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
@@ -27,6 +28,8 @@ app.include_router(news.router)
 app.include_router(users.router)
 app.include_router(favorite.router)
 app.include_router(history.router)
+
+app.include_router(ai_summary_router.router)
 
 # 挂载前端静态文件
 frontend_dist = Path(__file__).parent / "frontend" / "dist"

@@ -15,10 +15,11 @@ from schemas.news_sch import UserRequest, UserUpdateRequest
 from utils.secrity import get_password_hash
 
 
-#用户名查数据库
+#用户名查数据库有没有这个人
 async def get_user_by_username(username:str,db:AsyncSession):
     stmt=select(User).where(User.username==username)
     result=await db.execute(stmt)
+    #有的话返回orm对象，没有的话反回None
     return result.scalar_one_or_none()
 #创建用户
 async def create_user(user_data:UserRequest,db:AsyncSession):

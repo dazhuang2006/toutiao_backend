@@ -7,9 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from config.db_conf import get_db
 from crud import news_crud, news_crud_cache
+from llm.summarizer import summarize
 from schemas.news_sch import UserInfoResponse, UserAuthResponse
-
-from services.ai_summary_service import ai_summary_service
 
 #模块化路由
 router = APIRouter(prefix="/api/news",tags=["news"])
@@ -63,9 +62,9 @@ async def get_news_detail(news_id:int=Query(...,alias="id"),db:AsyncSession=Depe
     if not views_res:
         raise HTTPException(status_code=404,detail="新闻不存在")
     related_news=await news_crud.get_related_news(db,news_detail.id,news_detail.category_id)
-    summary = await ai_summary_service.get_summary(
-        db=db,
+    summary = await summarize(
         news_id=news_detail.id,
+        content=news_detail.content,
     )
 
     return {
