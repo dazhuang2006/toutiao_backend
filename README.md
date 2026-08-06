@@ -1,6 +1,6 @@
 # 今日头条新闻系统（toutiao_backend）
 
-基于 **FastAPI + MySQL + Redis + LangChain / DeepSeek** 的新闻资讯平台后端，提供用户认证、新闻浏览、收藏管理、浏览历史、Redis 缓存以及 AI 新闻摘要能力。前端使用 Vue 3 + Vite，后端异步架构设计，适合作为资讯类平台的学习与基础框架项目。
+基于 **FastAPI + MySQL + Redis + LangChain / DeepSeek + Milvus** 的新闻资讯平台，提供用户认证、新闻浏览、收藏管理、浏览历史、Redis 缓存、AI 新闻摘要、RAG 新闻问答与 Agent 新闻助手能力。前端使用 Vue 3 + Vite，并采用 The Verge 风格设计语言；后端异步架构设计，适合作为资讯类平台的学习与基础框架项目。
 
 ---
 
@@ -20,11 +20,13 @@
 - 相关新闻推荐
 - AI 新闻摘要
 
-### AI 摘要模块（LangChain + DeepSeek）
+### AI 能力（LangChain + DeepSeek + Milvus）
 
-- 使用 LangChain `PromptTemplate | ChatDeepSeek | StrOutputParser` 生成摘要
-- 多级缓存：Redis 命中 → MySQL 命中 → 调用大模型 → 写库 → 回填 Redis
-- Redis 不可用时自动降级，不影响摘要生成
+- AI 摘要：`PromptTemplate | ChatDeepSeek | StrOutputParser`
+  - 多级缓存：Redis 命中 → MySQL 命中 → 调用大模型 → 写库 → 回填 Redis
+  - Redis 不可用时自动降级，不影响摘要生成
+- RAG 新闻问答：新闻切块向量化存入 Milvus，检索相关片段后由 DeepSeek 生成带来源的回答
+- Agent 新闻助手：`create_agent` 封装检索与摘要工具，自动决定调用方式
 
 ### 收藏模块
 
@@ -52,8 +54,9 @@
 | 数据库 | MySQL 8、SQLAlchemy 2 Async ORM、aiomysql |
 | 缓存 | Redis 7、redis-py asyncio |
 | 安全认证 | Token Authentication、Passlib + Bcrypt |
-| AI 能力 | LangChain 1.x、langchain-deepseek、DeepSeek API |
-| 前端 | Vue 3、Vite、Vue Router、Axios |
+| AI 能力 | LangChain 1.x、langchain-deepseek、DeepSeek API、SiliconFlow BGE-M3 |
+| 向量库 | Milvus、pymilvus |
+| 前端 | Vue 3、Vite、Vue Router、Axios（The Verge 风格设计） |
 | 部署 | Uvicorn、Docker Compose |
 
 ---
@@ -66,20 +69,27 @@ toutiao_backend/
 ├── config/                  # 数据库、Redis、AI 配置
 ├── crud/                    # 数据库操作层
 ├── frontend/                # Vue 3 前端
-├── llm/                     # LangChain 模型与摘要逻辑
+├── llm/                     # LangChain AI 能力
 │   ├── model.py             # ChatDeepSeek 模型初始化
-│   └── summarizer.py        # PromptTemplate + Redis/MySQL 摘要链路
+│   ├── embeddings.py        # SiliconFlow BGE-M3 向量模型
+│   ├── summarizer.py        # 摘要链路（Redis + MySQL + DeepSeek）
+│   ├── rag.py               # Milvus 检索 + RAG 问答链
+│   ├── agent.py             # create_agent 新闻助手
+│   └── index_news.py        # 新闻向量索引脚本
 ├── models/                  # SQLAlchemy ORM 模型
 ├── prompts/                 # Prompt 文本模板（预留）
 ├── routers/                 # API 路由层
 │   ├── news.py              # 新闻相关接口
-│   ├── ai_summary_router.py # AI 摘要接口
+│   ├── ai_summary_router.py # AI 摘要 / RAG 问答 / Agent 接口
 │   ├── users.py             # 用户接口
 │   ├── favorite.py          # 收藏接口
 │   └── history.py           # 历史记录接口
 ├── schemas/                 # Pydantic 数据模型
+│   └── ask_sch.py           # AI 问答请求体
 ├── services/                # 独立服务 / 测试脚本
-│   └── test_summary.py      # AI 摘要本地测试脚本
+│   ├── test_summary.py      # AI 摘要本地测试
+│   ├── qa_demo.py           # RAG 问答本地测试
+│   └── agent_demo.py        # Agent 本地测试
 ├── utils/                   # 工具模块（认证、响应、异常处理）
 ├── main.py                  # FastAPI 入口
 ├── requirements.txt         # Python 依赖
@@ -96,6 +106,7 @@ toutiao_backend/
 - Python 3.11+
 - MySQL 8（或直接使用下面的 Docker Compose）
 - Redis 7
+- Milvus（RAG 功能需要，默认连接 http://localhost:19530）
 - Node.js 18+（仅前端开发时需要）
 
 ### 2. 配置环境变量
@@ -121,9 +132,13 @@ REDIS_DB=0
 
 DEEPSEEK_API_KEY=your_deepseek_api_key
 DEEPSEEK_API_URL=https://api.deepseek.com
+
+SILICONFLOW_BASE_URL=https://api.siliconflow.cn/v1
+SILICONFLOW_API_KEY=your_siliconflow_api_key
 ```
 
 > 注意：代码实际读取的键名是 `DEEPSEEK_API_URL`（见 `config/ai_conf.py`），`.env.example` 中旧的 `DEEPSEEK_BASE_URL` 建议统一改为 `DEEPSEEK_API_URL`。
+> RAG 新闻问答使用硅基流动 SiliconFlow 的 `BAAI/bge-m3` 向量模型，需要配置 `SILICONFLOW_BASE_URL` 与 `SILICONFLOW_API_KEY`。
 
 ### 3. 创建虚拟环境并安装依赖
 
@@ -181,7 +196,25 @@ asyncio.run(init_db())
 | history | 浏览历史表 |
 | news_ai_summary | AI 摘要表（`news_id` 唯一） |
 
-### 5. 启动后端
+### 5. 启动 Milvus 并建立新闻向量索引
+
+RAG 问答需要 Milvus 服务。可以使用课程资料中的 `standalone.bat`，或自行启动 Milvus standalone：
+
+```bash
+docker run -d --name milvus-standalone \
+  -p 19530:19530 -p 9091:9091 \
+  milvusdb/milvus:latest milvus run standalone
+```
+
+Milvus 就绪后，执行索引脚本，将 MySQL 中的新闻切块、向量化并写入 `news_docs` 集合：
+
+```bash
+.\.venv\Scripts\python -m llm.index_news
+```
+
+> 首次运行会调用 SiliconFlow embedding 接口；新闻内容变化后需要重新执行索引。学习阶段可以删除集合后重建。
+
+### 6. 启动后端
 
 ```bash
 uvicorn main:app --reload
@@ -193,7 +226,7 @@ uvicorn main:app --reload
 - Swagger 文档：http://127.0.0.1:8000/docs
 - ReDoc 文档：http://127.0.0.1:8000/redoc
 
-### 6. 启动前端
+### 7. 启动前端
 
 ```bash
 cd frontend
@@ -202,6 +235,7 @@ npm run dev
 ```
 
 前端开发服务器运行在 http://localhost:5173，`/api` 请求会自动代理到后端 8000 端口。
+界面采用 The Verge 风格设计：近黑画布、酸性薄荷绿 / 紫外紫强调色、1px 细边框与饱和色新闻卡片。
 
 也可以先构建前端，再由 FastAPI 直接托管静态文件：
 
@@ -229,6 +263,8 @@ npm run build
 | DEEPSEEK_API_KEY | 是 | DeepSeek API Key |
 | DEEPSEEK_API_URL | 否 | DeepSeek API 地址，默认 https://api.deepseek.com |
 | DEEPSEEK_MODEL | 否 | 模型名，默认 deepseek-chat（`llm/model.py` 当前硬编码了实际使用的模型） |
+| SILICONFLOW_BASE_URL | 否（RAG 需要） | SiliconFlow 接口地址，默认 https://api.siliconflow.cn/v1 |
+| SILICONFLOW_API_KEY | 否（RAG 需要） | SiliconFlow API Key，RAG 向量化使用 |
 | JWT_SECRET_KEY 等 | 否 | 预留配置，当前认证使用数据库 token 表 |
 
 ---
@@ -269,6 +305,8 @@ Authorization: Bearer <token>
 | GET | /api/news/list?categoryId=1&page=1&pageSize=10 | 新闻分页列表 | 否 |
 | GET | /api/news/detail?id=1 | 新闻详情（含 AI 摘要） | 否 |
 | GET | /api/news/ai-summary?id=1 | 单独获取 AI 摘要 | 否 |
+| POST | /api/news/ask | RAG 新闻问答，body：`{"question": "..."}`，返回回答与来源 | 否 |
+| POST | /api/news/agent | Agent 新闻助手问答，body：`{"question": "..."}` | 否 |
 
 ### 收藏模块
 
@@ -291,7 +329,9 @@ Authorization: Bearer <token>
 
 ---
 
-## AI 新闻摘要设计
+## AI 能力设计
+
+### AI 摘要
 
 摘要链路位于 `llm/summarizer.py`，核心是 LangChain 链：
 
@@ -323,6 +363,38 @@ PromptTemplate | ChatDeepSeek | StrOutputParser
 .\.venv\Scripts\python -m services.test_summary
 ```
 
+### RAG 新闻问答
+
+链路位于 `llm/rag.py`：
+
+```text
+问题 → Milvus 检索相关片段 → 拼 context → ChatPromptTemplate → DeepSeek → 回答 + 来源
+```
+
+- 新闻向量索引：`llm/index_news.py`（MySQL → 切块 → SiliconFlow BGE-M3 → Milvus）
+- 向量集合：`news_docs`，1024 维，余弦相似度
+- 接口：`POST /api/news/ask`
+
+本地测试问答：
+
+```bash
+.\.venv\Scripts\python -m services.qa_demo
+```
+
+### Agent 新闻助手
+
+链路位于 `llm/agent.py`，使用 `create_agent` 封装工具：
+
+- `search_news_tool`：在 Milvus 中检索新闻片段
+- `get_news_summary_tool`：按新闻 ID 获取 AI 摘要
+- 接口：`POST /api/news/agent`
+
+本地测试 Agent：
+
+```bash
+.\.venv\Scripts\python -m services.agent_demo
+```
+
 ---
 
 ## Redis 缓存设计
@@ -352,6 +424,8 @@ docker compose up -d --build
 | mysql | 3307 | MySQL 8，宿主机端口为 3307 |
 | redis | 6379 | Redis 7 |
 
+> RAG 使用的 Milvus 不在 compose 中，需要单独启动（见“快速开始”）。
+
 ---
 
 ## 常见问题
@@ -375,6 +449,18 @@ docker compose up -d --build
 **4. DeepSeek 调用报错？**
 
 确认 `.env` 中的 `DEEPSEEK_API_KEY` 和 `DEEPSEEK_API_URL` 正确，并确认模型名在 DeepSeek 官方接口中可用。
+
+**5. 向量检索结果不准？**
+
+确认 `llm/embeddings.py` 中设置了 `check_embedding_ctx_length=False`。langchain-openai 默认开启 tiktoken 长度检查，会把 token id 发给硅基流动，导致向量没有语义。
+
+**6. Milvus 连接被拒（localhost:19530）？**
+
+Milvus 服务没有启动。先启动 Milvus，再执行 `llm.index_news` 和问答接口。
+
+**7. 搜不到 `news_docs` 集合？**
+
+还没有成功执行 `python -m llm.index_news`。确认 `.env` 中 `SILICONFLOW_API_KEY` 已配置，Milvus 已启动，然后重新执行索引。
 
 ---
 

@@ -1,7 +1,10 @@
 <template>
   <div class="page history-page">
     <div class="page-header">
-      <h1 class="page-title">浏览历史</h1>
+      <div>
+        <div class="page-kicker mono">History</div>
+        <h1 class="page-title">浏览历史</h1>
+      </div>
       <button v-if="list.length > 0" class="btn btn-sm btn-outline" @click="handleClear">清空</button>
     </div>
 
@@ -96,16 +99,18 @@ onMounted(loadHistory)
 </script>
 
 <style scoped>
-.history-page { padding-top: calc(var(--header-height) + 8px); }
-.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.page-title { font-size: 18px; font-weight: 700; color: var(--text); }
-.history-item { display: flex; align-items: center; gap: 12px; background: var(--surface); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 8px; box-shadow: var(--shadow-sm); }
+.history-page { padding-top: calc(var(--header-height) + 20px); max-width: 860px; }
+.page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; }
+.page-kicker { font-size: 11px; color: var(--mint); margin-bottom: 6px; }
+.page-title { font-size: 32px; font-weight: 800; color: var(--text); }
+.history-item { display: flex; align-items: center; gap: 16px; background: var(--canvas-soft); border: 1px solid var(--hairline); border-bottom-color: var(--hairline-bright); padding: 14px 18px; margin-bottom: 12px; }
 .history-link { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
 .history-info { flex: 1; min-width: 0; }
-.history-title { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-.history-meta { display: flex; gap: 12px; font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-.history-thumb { width: 64px; height: 48px; object-fit: cover; border-radius: 4px; flex-shrink: 0; }
+.history-title { font-size: 17px; font-weight: 700; color: var(--text); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.history-title:hover { color: var(--mint); }
+.history-meta { display: flex; gap: 14px; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; color: var(--text-muted); margin-top: 6px; }
+.history-thumb { width: 76px; height: 56px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--hairline); }
 .history-del { flex-shrink: 0; padding: 6px; color: var(--text-muted); border-radius: 50%; transition: color 0.15s; }
-.history-del:hover { color: var(--primary); }
+.history-del:hover { color: var(--danger); }
 .load-more { text-align: center; padding: 16px 0; }
 </style>

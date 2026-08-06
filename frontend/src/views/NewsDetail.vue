@@ -4,27 +4,29 @@
     <div v-else-if="error" class="empty">{{ error }}</div>
 
     <template v-else-if="news">
-      <article class="detail-card">
-        <h1 class="detail-title">{{ news.title }}</h1>
+      <article class="article">
+        <header class="article-header">
+          <div class="article-kicker mono">Latest / 新闻详情</div>
+          <h1 class="article-title">{{ news.title }}</h1>
+          <div class="article-meta mono">
+            <span v-if="news.author">{{ news.author }}</span>
+            <span>{{ formatDate(news.publishTime) }}</span>
+            <span>{{ news.views }} 阅读</span>
+          </div>
+        </header>
 
-        <div class="detail-meta">
-          <span v-if="news.author" class="meta-item author">{{ news.author }}</span>
-          <span class="meta-item">{{ formatDate(news.publishTime) }}</span>
-          <span class="meta-item">{{ news.views }} 阅读</span>
+        <img v-if="news.image" :src="news.image" :alt="news.title" class="article-image" />
+
+        <div v-if="news.summary" class="ai-panel">
+          <div class="ai-badge mono">AI 摘要 // Generated</div>
+          <p class="ai-text">{{ news.summary }}</p>
         </div>
 
-        <img v-if="news.image" :src="news.image" :alt="news.title" class="detail-image" />
+        <div class="article-content" v-html="news.content"></div>
 
-        <div v-if="news.summary" class="summary-box">
-          <span class="summary-badge">AI 摘要</span>
-          <p class="summary-text">{{ news.summary }}</p>
-        </div>
-
-        <div class="detail-content" v-html="news.content"></div>
-
-        <div class="detail-actions">
+        <div class="article-actions">
           <button
-            :class="['btn', isFavorited ? 'btn-danger' : 'btn-outline']"
+            :class="['btn', isFavorited ? 'btn-primary' : 'btn-outline']"
             @click="toggleFavorite"
             :disabled="favSubmitting"
           >
@@ -36,13 +38,12 @@
       </article>
 
       <section class="related-section" v-if="news.relatedNews && news.relatedNews.length > 0">
-        <h3 class="section-title">相关推荐</h3>
-        <div v-for="item in news.relatedNews" :key="item.id" class="related-item">
-          <router-link :to="'/news/' + item.id" class="related-link">
-            <span class="related-title">{{ item.title }}</span>
-            <span class="related-views">{{ item.views }} 阅读</span>
-          </router-link>
-        </div>
+        <h2 class="related-title mono">Related / 相关推荐</h2>
+        <router-link v-for="(item, i) in news.relatedNews" :key="item.id" :to="'/news/' + item.id" class="related-row">
+          <span class="related-index mono">{{ String(i + 1).padStart(2, "0") }}</span>
+          <span class="related-headline">{{ item.title }}</span>
+          <span class="related-views mono">{{ item.views }} 阅读</span>
+        </router-link>
       </section>
     </template>
   </div>
@@ -107,24 +108,32 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.detail-page { padding-top: calc(var(--header-height) + 8px); }
-.detail-card { background: var(--surface); border-radius: var(--radius-md); padding: 24px 20px; box-shadow: var(--shadow-sm); }
-.detail-title { font-size: 22px; font-weight: 700; line-height: 1.4; margin-bottom: 12px; color: var(--text); }
-.detail-meta { display: flex; gap: 16px; font-size: 13px; color: var(--text-muted); margin-bottom: 20px; flex-wrap: wrap; }
-.meta-item.author { color: var(--accent); font-weight: 500; }
-.detail-image { width: 100%; max-height: 400px; object-fit: cover; border-radius: var(--radius-sm); margin-bottom: 20px; }
-.summary-box { background: var(--accent-soft); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 20px; border-left: 3px solid var(--accent); }
-.summary-badge { display: inline-block; font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-.summary-text { font-size: 15px; line-height: 1.7; color: var(--text-secondary); }
-.detail-content { font-size: 16px; line-height: 1.8; color: var(--text); margin-bottom: 20px; }
-.detail-content :deep(p) { margin-bottom: 16px; }
-.detail-content :deep(img) { border-radius: var(--radius-xs); margin: 16px 0; }
-.detail-actions { display: flex; gap: 12px; padding-top: 16px; border-top: 1px solid var(--border); }
-.related-section { margin-top: 28px; }
-.section-title { font-size: 17px; font-weight: 600; margin-bottom: 12px; padding-left: 12px; border-left: 3px solid var(--primary); color: var(--text); }
-.related-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
-.related-link { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.related-title { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.related-views { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
-@media (max-width: 480px) { .detail-card { padding: 20px 16px; } .detail-title { font-size: 20px; } }
+.detail-page { padding-top: calc(var(--header-height) + 20px); max-width: 960px; }
+.article { border: 1px solid var(--hairline); background: var(--canvas-soft); }
+.article-header { padding: 36px 36px 0; }
+.article-kicker { font-size: 11px; color: var(--mint); margin-bottom: 14px; }
+.article-title { font-size: 40px; font-weight: 800; line-height: 1.18; color: var(--text); }
+.article-meta { display: flex; gap: 18px; font-size: 11px; color: var(--text-muted); margin-top: 18px; padding-bottom: 24px; border-bottom: 1px solid var(--hairline); flex-wrap: wrap; }
+.article-image { width: 100%; max-height: 460px; object-fit: cover; border-bottom: 1px solid var(--hairline); margin-top: 24px; }
+.ai-panel { margin: 28px 36px 0; background: var(--black); border: 1px solid var(--mint); border-left: 4px solid var(--mint); padding: 18px 20px; }
+.ai-badge { font-size: 10px; color: var(--mint); margin-bottom: 10px; }
+.ai-text { font-size: 16px; line-height: 1.8; color: var(--text-secondary); }
+.article-content { padding: 28px 36px 36px; font-size: 17px; line-height: 1.95; color: var(--text); }
+.article-content :deep(p) { margin-bottom: 18px; }
+.article-content :deep(img) { margin: 20px 0; border: 1px solid var(--hairline); }
+.article-actions { padding: 0 36px 36px; display: flex; gap: 12px; }
+.related-section { margin-top: 36px; }
+.related-title { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+.related-row { display: flex; align-items: center; gap: 16px; padding: 16px 4px; border-bottom: 1px solid var(--hairline); }
+.related-row:hover .related-headline { color: var(--mint); }
+.related-index { font-size: 11px; color: var(--mint); }
+.related-headline { font-size: 16px; font-weight: 700; flex: 1; }
+.related-views { font-size: 10px; color: var(--text-muted); }
+@media (max-width: 768px) {
+  .article-header { padding: 24px 20px 0; }
+  .article-title { font-size: 28px; }
+  .ai-panel { margin: 20px 20px 0; }
+  .article-content { padding: 20px; font-size: 16px; }
+  .article-actions { padding: 0 20px 24px; }
+}
 </style>

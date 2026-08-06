@@ -1,7 +1,10 @@
 <template>
   <div class="page fav-page">
     <div class="page-header">
-      <h1 class="page-title">我的收藏</h1>
+      <div>
+        <div class="page-kicker mono">Saved</div>
+        <h1 class="page-title">我的收藏</h1>
+      </div>
       <button v-if="list.length > 0" class="btn btn-sm btn-outline" @click="handleClear">清空</button>
     </div>
 
@@ -9,7 +12,9 @@
     <div v-else-if="list.length === 0" class="empty">还没有收藏任何新闻</div>
 
     <template v-else>
-      <NewsCard v-for="item in list" :key="item.id" :news="item" />
+      <div class="fav-grid">
+        <NewsCard v-for="item in list" :key="item.id" :news="item" />
+      </div>
 
       <div class="load-more" v-if="hasMore">
         <button class="btn btn-outline" @click="loadMore" :disabled="loadingMore">
@@ -66,8 +71,11 @@ onMounted(loadFavs)
 </script>
 
 <style scoped>
-.fav-page { padding-top: calc(var(--header-height) + 8px); }
-.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.page-title { font-size: 18px; font-weight: 700; color: var(--text); }
+.fav-page { padding-top: calc(var(--header-height) + 20px); }
+.page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; }
+.page-kicker { font-size: 11px; color: var(--mint); margin-bottom: 6px; }
+.page-title { font-size: 32px; font-weight: 800; color: var(--text); }
+.fav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
 .load-more { text-align: center; padding: 16px 0; }
+@media (max-width: 768px) { .fav-grid { grid-template-columns: 1fr; gap: 16px; } }
 </style>

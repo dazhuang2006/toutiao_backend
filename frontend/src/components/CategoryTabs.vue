@@ -18,20 +18,21 @@ defineEmits(["select"])
 <style scoped>
 .category-tabs-wrapper {
   position: sticky; top: var(--header-height); z-index: 50;
-  background: var(--canvas); padding: 8px 0; margin: 0 -16px;
-  padding-left: 16px; margin-bottom: 4px;
+  background: var(--canvas); border-bottom: 1px solid var(--hairline);
+  margin: 0 -24px; padding: 0 24px; margin-bottom: 24px;
 }
 .category-tabs {
-  display: flex; gap: 8px; overflow-x: auto;
-  -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-right: 16px;
+  display: flex; gap: 24px; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
 }
 .category-tabs::-webkit-scrollbar { display: none; }
 .cat-tab {
-  flex-shrink: 0; padding: 6px 16px; border-radius: var(--radius-pill);
-  font-size: 14px; font-weight: 500; background: var(--surface);
-  border: 1px solid var(--border); color: var(--text-secondary);
-  transition: all 0.15s; white-space: nowrap;
+  flex-shrink: 0; padding: 14px 2px;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600; text-transform: uppercase;
+  color: var(--text-muted); border-bottom: 2px solid transparent;
+  transition: color 0.12s, border-color 0.12s; white-space: nowrap;
 }
-.cat-tab:hover { border-color: var(--primary); color: var(--primary); }
-.cat-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.cat-tab:hover { color: var(--mint); }
+.cat-tab.active { color: var(--text); border-bottom-color: var(--mint); }
+@media (max-width: 768px) { .category-tabs-wrapper { margin: 0 -16px; padding: 0 16px; } }
 </style>

@@ -13,3 +13,7 @@ export function getNewsList(categoryId, page = 1, pageSize = 10) {
 export function getNewsDetail(id) {
   return request.get('/news/detail', { params: { id } })
 }
+
+export function askNews(question) {
+  return request.post('/news/ask', { question })
+}

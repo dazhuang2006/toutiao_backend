@@ -1,6 +1,7 @@
 <template>
   <div class="page auth-page">
     <div class="auth-card">
+      <div class="auth-kicker mono">Join Now</div>
       <h1 class="auth-title">注册</h1>
       <p class="auth-subtitle">创建你的 AI 头条账号</p>
       <form @submit.prevent="handleRegister">
@@ -55,13 +56,14 @@ async function handleRegister() {
 
 <style scoped>
 .auth-page { display: flex; align-items: flex-start; justify-content: center; padding-top: 60px; }
-.auth-card { background: var(--surface); border-radius: var(--radius-md); padding: 32px 28px; width: 100%; max-width: 400px; box-shadow: var(--shadow-sm); }
-.auth-title { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.auth-card { background: var(--canvas-soft); border: 1px solid var(--hairline-bright); padding: 36px 32px; width: 100%; max-width: 420px; }
+.auth-kicker { font-size: 10px; color: var(--mint); margin-bottom: 10px; }
+.auth-title { font-size: 32px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
 .auth-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
 .form-group { margin-bottom: 16px; }
-.form-label { display: block; font-size: 14px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
+.form-label { display: block; font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 6px; }
 .auth-btn { width: 100%; margin-top: 8px; padding: 10px; font-size: 15px; }
 .auth-footer { text-align: center; margin-top: 20px; font-size: 14px; color: var(--text-muted); }
-.auth-link { color: var(--accent); font-weight: 500; }
+.auth-link { color: var(--mint); font-weight: 600; }
 .auth-link:hover { text-decoration: underline; }
 </style>

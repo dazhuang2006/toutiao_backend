@@ -10,7 +10,7 @@
     </div>
 
     <div class="profile-section">
-      <h3 class="section-label">个人信息</h3>
+      <h3 class="section-label mono">个人信息 / Profile</h3>
       <div class="form-group">
         <label class="form-label">昵称</label>
         <input v-model="form.nickname" class="input" placeholder="设置昵称" />
@@ -25,7 +25,7 @@
     </div>
 
     <div class="profile-section">
-      <h3 class="section-label">修改密码</h3>
+      <h3 class="section-label mono">修改密码 / Security</h3>
       <div class="form-group">
         <label class="form-label">旧密码</label>
         <input v-model="pwdForm.oldPassword" type="password" class="input" placeholder="输入旧密码" />
@@ -92,16 +92,16 @@ function handleLogout() {
 </script>
 
 <style scoped>
-.profile-header { text-align: center; padding: 24px 0 20px; }
-.profile-avatar { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 12px; overflow: hidden; background: var(--primary-soft); display: flex; align-items: center; justify-content: center; }
+.profile-header { text-align: center; padding: 24px 0 28px; }
+.profile-avatar { width: 80px; height: 80px; margin: 0 auto 14px; overflow: hidden; background: var(--surface); border: 1px solid var(--mint); display: flex; align-items: center; justify-content: center; }
 .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.avatar-letter { font-size: 28px; font-weight: 700; color: var(--primary); }
-.profile-name { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.avatar-letter { font-size: 30px; font-weight: 800; color: var(--mint); }
+.profile-name { font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
 .profile-bio { font-size: 14px; color: var(--text-muted); }
-.profile-section { background: var(--surface); border-radius: var(--radius-md); padding: 20px; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
-.section-label { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.profile-section { background: var(--canvas-soft); border: 1px solid var(--hairline); padding: 24px; margin-bottom: 16px; }
+.section-label { font-size: 11px; font-weight: 600; color: var(--mint); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--hairline); }
 .form-group { margin-bottom: 14px; }
-.form-label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
+.form-label { display: block; font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 6px; }
 .logout-section { margin-top: 24px; }
 .logout-btn { width: 100%; padding: 10px; font-size: 15px; }
 </style>

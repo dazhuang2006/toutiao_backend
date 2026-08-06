@@ -6,14 +6,19 @@
     <div v-else-if="newsList.length === 0" class="empty">暂无新闻</div>
 
     <template v-else>
-      <NewsCard v-for="item in newsList" :key="item.id" :news="item" />
+      <section v-if="newsList[0]" class="hero-row">
+        <NewsCard :news="newsList[0]" hero />
+      </section>
+      <section v-if="newsList.length > 1" class="story-grid">
+        <NewsCard v-for="item in newsList.slice(1)" :key="item.id" :news="item" />
+      </section>
 
       <div class="load-more" v-if="hasMore">
         <button class="btn btn-outline" @click="loadMore" :disabled="loadingMore">
           {{ loadingMore ? "加载中..." : "加载更多" }}
         </button>
       </div>
-      <div v-else-if="newsList.length > 0" class="no-more">&mdash; 没有更多了 &mdash;</div>
+      <div v-else-if="newsList.length > 0" class="no-more mono">— 没有更多了 —</div>
     </template>
   </div>
 </template>
@@ -77,7 +82,10 @@ onMounted(loadCategories)
 </script>
 
 <style scoped>
-.home-page { padding-top: calc(var(--header-height)); padding-bottom: 20px; }
-.load-more { text-align: center; padding: 20px 0; }
-.no-more { text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 13px; }
+.home-page { padding-top: calc(var(--header-height)); padding-bottom: 40px; }
+.hero-row { margin-bottom: 24px; }
+.story-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+.load-more { text-align: center; padding: 28px 0; }
+.no-more { text-align: center; padding: 28px 0; color: var(--text-muted); font-size: 12px; }
+@media (max-width: 768px) { .story-grid { grid-template-columns: 1fr; gap: 16px; } }
 </style>
