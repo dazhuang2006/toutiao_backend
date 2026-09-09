@@ -115,7 +115,7 @@ onMounted(async () => {
 .article-title { font-size: 40px; font-weight: 800; line-height: 1.18; color: var(--text); }
 .article-meta { display: flex; gap: 18px; font-size: 11px; color: var(--text-muted); margin-top: 18px; padding-bottom: 24px; border-bottom: 1px solid var(--hairline); flex-wrap: wrap; }
 .article-image { width: 100%; max-height: 460px; object-fit: cover; border-bottom: 1px solid var(--hairline); margin-top: 24px; }
-.ai-panel { margin: 28px 36px 0; background: var(--black); border: 1px solid var(--mint); border-left: 4px solid var(--mint); padding: 18px 20px; }
+.ai-panel { margin: 28px 36px 0; background: var(--surface); border: 1px solid var(--hairline); border-left: 4px solid var(--mint); padding: 18px 20px; }
 .ai-badge { font-size: 10px; color: var(--mint); margin-bottom: 10px; }
 .ai-text { font-size: 16px; line-height: 1.8; color: var(--text-secondary); }
 .article-content { padding: 28px 36px 36px; font-size: 17px; line-height: 1.95; color: var(--text); }

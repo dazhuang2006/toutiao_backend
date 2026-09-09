@@ -58,7 +58,7 @@ async function handleLogin() {
 
 <style scoped>
 .auth-page { display: flex; align-items: flex-start; justify-content: center; padding-top: 60px; }
-.auth-card { background: var(--canvas-soft); border: 1px solid var(--hairline-bright); padding: 36px 32px; width: 100%; max-width: 420px; }
+.auth-card { background: var(--canvas-soft); border: 1px solid var(--hairline); padding: 36px 32px; width: 100%; max-width: 420px; }
 .auth-kicker { font-size: 10px; color: var(--mint); margin-bottom: 10px; }
 .auth-title { font-size: 32px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
 .auth-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }

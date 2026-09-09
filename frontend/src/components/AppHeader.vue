@@ -10,8 +10,8 @@
       <nav class="header-nav">
         <router-link to="/" class="nav-link">首页</router-link>
         <router-link to="/ask" class="nav-link">AI 问</router-link>
-        <router-link v-if="isLoggedIn" to="/favorites" class="nav-link">收藏</router-link>
-        <router-link v-if="isLoggedIn" to="/history" class="nav-link">历史</router-link>
+        <router-link to="/favorites" class="nav-link">收藏</router-link>
+        <router-link to="/history" class="nav-link">历史</router-link>
       </nav>
 
       <div class="header-right">
@@ -71,7 +71,7 @@ const { isLoggedIn, userInfo } = useUserStore()
 .avatar { width: 34px; height: 34px; object-fit: cover; border: 1px solid var(--mint); }
 .avatar-placeholder {
   width: 34px; height: 34px;
-  background: var(--uv-soft); color: #fff;
+  background: var(--uv); color: #fff;
   display: flex; align-items: center; justify-content: center;
   font-size: 14px; font-weight: 700;
   border: 1px solid var(--mint);

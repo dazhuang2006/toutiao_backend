@@ -103,7 +103,7 @@ onMounted(loadHistory)
 .page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; }
 .page-kicker { font-size: 11px; color: var(--mint); margin-bottom: 6px; }
 .page-title { font-size: 32px; font-weight: 800; color: var(--text); }
-.history-item { display: flex; align-items: center; gap: 16px; background: var(--canvas-soft); border: 1px solid var(--hairline); border-bottom-color: var(--hairline-bright); padding: 14px 18px; margin-bottom: 12px; }
+.history-item { display: flex; align-items: center; gap: 16px; background: var(--canvas-soft); border: 1px solid var(--hairline); border-bottom-color: var(--hairline); padding: 14px 18px; margin-bottom: 12px; }
 .history-link { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
 .history-info { flex: 1; min-width: 0; }
 .history-title { font-size: 17px; font-weight: 700; color: var(--text); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }

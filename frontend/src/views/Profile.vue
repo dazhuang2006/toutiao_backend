@@ -10,6 +10,30 @@
     </div>
 
     <div class="profile-section">
+      <h3 class="section-label mono">我的内容 / Library</h3>
+      <div class="library-nav">
+        <router-link to="/favorites" class="library-link">
+          <span class="library-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          </span>
+          <span class="library-info">
+            <strong>我的收藏</strong>
+          </span>
+          <svg class="library-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </router-link>
+        <router-link to="/history" class="library-link">
+          <span class="library-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </span>
+          <span class="library-info">
+            <strong>浏览历史</strong>
+          </span>
+          <svg class="library-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </router-link>
+      </div>
+    </div>
+
+    <div class="profile-section">
       <h3 class="section-label mono">个人信息 / Profile</h3>
       <div class="form-group">
         <label class="form-label">昵称</label>
@@ -100,6 +124,15 @@ function handleLogout() {
 .profile-bio { font-size: 14px; color: var(--text-muted); }
 .profile-section { background: var(--canvas-soft); border: 1px solid var(--hairline); padding: 24px; margin-bottom: 16px; }
 .section-label { font-size: 11px; font-weight: 600; color: var(--mint); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--hairline); }
+.library-nav { border-top: 1px solid var(--hairline); }
+.library-link { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 12px 2px; border-bottom: 1px solid var(--hairline); transition: color 0.14s ease; }
+.library-link:last-child { border-bottom: none; }
+.library-link:hover { color: var(--mint); }
+.library-icon { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; flex-shrink: 0; color: var(--mint); border: 1px solid var(--mint-deep); }
+.library-info { display: flex; flex-direction: column; min-width: 0; }
+.library-info strong { font-size: 14px; line-height: 1.35; }
+.library-arrow { flex-shrink: 0; color: var(--text-muted); margin-left: auto; }
+.library-link:hover .library-arrow { color: var(--mint); }
 .form-group { margin-bottom: 14px; }
 .form-label { display: block; font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 6px; }
 .logout-section { margin-top: 24px; }

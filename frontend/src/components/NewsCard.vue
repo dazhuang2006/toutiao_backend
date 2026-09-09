@@ -40,13 +40,13 @@ function formatTime(dateStr) {
 <style scoped>
 .news-card {
   display: flex; flex-direction: column;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--hairline);
   background: var(--surface);
   min-height: 100%;
   transition: border-color 0.12s ease;
 }
 .news-card:hover { border-color: var(--mint); }
-.card-image { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: var(--black); border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+.card-image { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: var(--surface-tile); border-bottom: 1px solid var(--hairline); }
 .card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
 .news-card:hover .card-image img { transform: scale(1.03); }
 .card-body { display: flex; flex-direction: column; gap: 10px; padding: 18px 20px 20px; flex: 1; }
@@ -68,7 +68,7 @@ function formatTime(dateStr) {
 .news-card.hero .card-image { aspect-ratio: 21 / 9; }
 
 .news-card.tile-accent { border-color: var(--black); }
-.tile-accent[data-accent="0"] { background: var(--mint); }
+.tile-accent[data-accent="0"] { background: var(--mint-bright); }
 .tile-accent[data-accent="1"] { background: var(--uv-soft); }
 .tile-accent[data-accent="2"] { background: var(--tile-yellow); }
 .tile-accent[data-accent="3"] { background: var(--tile-pink); }
