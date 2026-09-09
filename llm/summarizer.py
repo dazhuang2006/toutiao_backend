@@ -23,6 +23,9 @@ summary_chain = PromptTemplate.from_template(PROMPT) | model | StrOutputParser()
 
 CACHE_EXPIRE = 60 * 60 * 24  # 24小时
 
+# 临时实验计数器：仅在真正调用大模型前加 1
+LLM_CALL_COUNT = 0
+
 
 def _cache_key(news_id: int) -> str:
     return f"news:summary:{news_id}"
@@ -41,6 +44,8 @@ async def summarize(news_id: int, content: str) -> str:
         await set_cache(cache_key, summary, expire=CACHE_EXPIRE)
         return summary
 
+    global LLM_CALL_COUNT
+    LLM_CALL_COUNT += 1
     summary = await summary_chain.ainvoke({"content": content})
     await save_summary(news_id, summary)
     await set_cache(cache_key, summary, expire=CACHE_EXPIRE)
