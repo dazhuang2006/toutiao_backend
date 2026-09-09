@@ -132,12 +132,12 @@ REDIS_DB=0
 
 DEEPSEEK_API_KEY=your_deepseek_api_key
 DEEPSEEK_API_URL=https://api.deepseek.com
+DEEPSEEK_MODEL=deepseek-v4-flash
 
 SILICONFLOW_BASE_URL=https://api.siliconflow.cn/v1
 SILICONFLOW_API_KEY=your_siliconflow_api_key
 ```
 
-> 注意：代码实际读取的键名是 `DEEPSEEK_API_URL`（见 `config/ai_conf.py`），`.env.example` 中旧的 `DEEPSEEK_BASE_URL` 建议统一改为 `DEEPSEEK_API_URL`。
 > RAG 新闻问答使用硅基流动 SiliconFlow 的 `BAAI/bge-m3` 向量模型，需要配置 `SILICONFLOW_BASE_URL` 与 `SILICONFLOW_API_KEY`。
 
 ### 3. 创建虚拟环境并安装依赖
@@ -246,6 +246,28 @@ npm run build
 
 构建产物位于 `frontend/dist`，后端检测到该目录后会自动挂载。
 
+### 8. 一键启动脚本（Windows）
+
+项目根目录提供了 `start_all.ps1` / `start_all.bat`，可以一键拉起 MySQL、Redis、Docker、Milvus，以及后端和前端：
+
+```powershell
+.\start_all.ps1
+```
+
+默认后端使用 8010 端口，避免本机 8000 被其他服务占用；前端 Vite 会自动把 `/api` 代理到该端口。也可以手动指定端口：
+
+```powershell
+.\start_all.ps1 -BackendPort 8000
+```
+
+只启动 MySQL / Redis / Docker / Milvus，不启动后端和前端：
+
+```powershell
+.\start_all.ps1 -EnvOnly
+```
+
+双击 `start_all.bat` 也可以运行同一套启动逻辑，后端与前端日志写入 `runtime_logs/`。
+
 ---
 
 ## 环境变量说明
@@ -262,7 +284,7 @@ npm run build
 | REDIS_DB | 是 | Redis 数据库编号，默认 0 |
 | DEEPSEEK_API_KEY | 是 | DeepSeek API Key |
 | DEEPSEEK_API_URL | 否 | DeepSeek API 地址，默认 https://api.deepseek.com |
-| DEEPSEEK_MODEL | 否 | 模型名，默认 deepseek-chat（`llm/model.py` 当前硬编码了实际使用的模型） |
+| DEEPSEEK_MODEL | 否 | DeepSeek 模型名，默认 deepseek-v4-flash，由 `llm/model.py` 读取并使用 |
 | SILICONFLOW_BASE_URL | 否（RAG 需要） | SiliconFlow 接口地址，默认 https://api.siliconflow.cn/v1 |
 | SILICONFLOW_API_KEY | 否（RAG 需要） | SiliconFlow API Key，RAG 向量化使用 |
 | JWT_SECRET_KEY 等 | 否 | 预留配置，当前认证使用数据库 token 表 |
@@ -354,7 +376,7 @@ PromptTemplate | ChatDeepSeek | StrOutputParser
 - 缓存 key：`news:summary:{news_id}`
 - 摘要结果以 `news_id` 为唯一键持久化，重复请求不会重复调用大模型
 - Redis 不可用时 `get_cache` / `set_cache` 自动降级，只会打印错误日志，不影响接口
-- 模型配置在 `llm/model.py`，当前使用 `deepseek:deepseek-v4-flash`，请以 DeepSeek 官方实际支持的模型名为准
+- 模型配置集中在 `config/ai_conf.py`，`llm/model.py` 读取 `DEEPSEEK_MODEL` 初始化模型，默认 `deepseek-v4-flash`
 
 本地测试摘要：
 

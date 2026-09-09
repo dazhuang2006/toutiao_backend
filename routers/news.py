@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from config.db_conf import get_db
 from crud import news_crud, news_crud_cache
 from llm.summarizer import summarize
-from schemas.news_sch import UserInfoResponse, UserAuthResponse
+from schemas.base import NewsItemBase
 
 #模块化路由
 router = APIRouter(prefix="/api/news",tags=["news"])
@@ -42,11 +42,16 @@ async def get_news(
     #是否还有更多新闻
     has_more=(offset+len(new_list))<total
 
+    news_items = [
+        NewsItemBase.model_validate(item).model_dump(mode="json", by_alias=True)
+        for item in new_list
+    ]
+
     return{
         "code":200,
         "message":"success",
         "data":{
-            "list":new_list,
+            "list":news_items,
             "total":total,
             "hasMore":has_more
         }

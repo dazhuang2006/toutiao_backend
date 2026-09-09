@@ -4,7 +4,7 @@ from sqlalchemy import select
 
 from config.cache_conf import get_cache, set_cache
 from config.db_conf import AsyncSessionLocal
-from llm.model import model
+from llm.model import MODEL_NAME, model
 from models.ai_summary import NewsAISummary
 
 PROMPT = """你是一名专业新闻编辑。
@@ -63,7 +63,7 @@ async def save_summary(news_id: int, summary: str) -> None:
             NewsAISummary(
                 news_id=news_id,
                 summary=summary,
-                model_name="deepseek:deepseek-v4-flash",
+                model_name=MODEL_NAME,
                 prompt_version="v1",
                 status=1,
             )
