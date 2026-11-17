@@ -502,3 +502,9 @@ Milvus 服务没有启动。先启动 Milvus，再执行 `llm.index_news` 和问
 ## 作者
 
 大壮
+
+---
+
+## 许可证
+
+MIT License
