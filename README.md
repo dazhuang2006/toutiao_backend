@@ -502,3 +502,31 @@ Milvus 服务没有启动。先启动 Milvus，再执行 `llm.index_news` 和问
 ## 作者
 
 大壮
+
+---
+
+## 常见问题
+
+**1. 接口一直返回 401 / 提示登录失效，怎么排查？**
+
+本项目使用数据库 token 表认证，token 有效期为 7 天。请检查三点：
+
+- 请求头是否写成 `Authorization: Bearer <token>`（`Bearer` 后有空格）
+- token 是否来自同一套数据库（换库 / 重新初始化后旧 token 会失效，需要重新登录）
+- 浏览器或前端是否仍缓存了上一次登录的旧 token，可在登录页重新登录
+
+**2. 前端页面能打开，但所有 `/api` 请求都报 404 或跨域？**
+
+通常是代理端口没对上。前端通过 Vite 将 `/api` 代理到后端：
+
+- 后端默认 8000：`cd frontend && npm run dev`
+- 使用 `start_all.ps1` 时后端默认 8010，此时确认 Vite 代理目标也是 8010，或改用 `.\start_all.ps1 -BackendPort 8000`
+- 若改用 `npm run build` 由 FastAPI 托管静态文件，请确认 `frontend/dist` 已生成，并直接访问后端端口（如 http://127.0.0.1:8000）
+
+**3. 修改了新闻内容，但 AI 问答仍然返回旧答案？**
+
+AI 摘要与 RAG 问答都有缓存 / 索引层，数据更新后需要逐层刷新：
+
+- 摘要：先用 `news:summary:{news_id}` 对应的 Redis 缓存确认，必要时删除该 key 或 MySQL `news_ai_summary` 记录，强制重新生成
+- 向量：新闻内容变化后需要重新执行 `.\.venv\Scripts\python -m llm.index_news` 重建 `news_docs` 索引
+- 列表 / 详情：删除 `news:detail:{news_id}`、`news_list:*` 缓存，或等待缓存过期
